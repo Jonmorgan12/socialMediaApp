@@ -13,6 +13,9 @@ app.use(express.json()); // this is the body parser
 connectDb();
 
 nextApp.prepare().then(() => {
+  app.use("api/signup", require("./api/signup"));
+  app.use("api/auth", require("./api/auth"));
+
   // all pages in next js are ssr server side rendering (needs app.all)
   app.all("*", (req, res) => handle(req, res));
 
