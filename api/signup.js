@@ -13,7 +13,7 @@ const userPng =
 
 const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
-// get request to get a single user
+// get request when creating a new user
 router.get("/:username", async (req, res) => {
   const { username } = req.params;
 
@@ -33,6 +33,7 @@ router.get("/:username", async (req, res) => {
       username: username.toLocaleLowerCase(),
     });
 
+    // if user is found with the same username
     if (user) {
       return res.status(401).send("Username is already Taken");
     }
@@ -58,18 +59,22 @@ router.post("/", async (req, res) => {
     instagram,
   } = req.body.user;
 
+  // if the email is valid
   if (!isEmail(email)) {
     return res.status(401).send("Invalid Email");
   }
 
+  // if the password is greater than 6 characters
   if (password.length > 6) {
     return res.status(401).send("Password must be at least 6 characters");
   }
 
   try {
+    // if there is no other user with this email
     let user;
     user = await UserModel.findOne({ email: email.toLocaleLowerCase() });
 
+    // if user is found
     if (user) {
       return res.status(401).send("User already registered");
     }
@@ -83,6 +88,7 @@ router.post("/", async (req, res) => {
       ProfilePicUrl: req.body.ProfilePicUrl || userPng,
     });
 
+    //hashing our password
     user.password = await bcrypt.hash(password, 10);
     await user.save();
 
@@ -107,6 +113,7 @@ router.post("/", async (req, res) => {
       profilefields.social.twitter = twitter;
     }
 
+    // after these two models are created we will send a token back to the front end
     await new ProfileModel(profilefields).save();
     await new FollowerModel({
       user: user._id,
@@ -119,7 +126,7 @@ router.post("/", async (req, res) => {
       payload,
       process.env.jwtSecret,
       { expiresIn: "2d" },
-      (err, token) => {
+      (error, token) => {
         if (error) {
           throw error;
         }
