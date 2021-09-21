@@ -5,7 +5,7 @@ const UserModel = require("../models/UserModel");
 const ProfileModel = require("../models/ProfileModel");
 const FollowerModel = require("../models/FollowerModel");
 
-const jwt = require("jasonwebtoken");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const isEmail = require("validator/lib/isEmail");
 const userPng =
@@ -16,6 +16,7 @@ const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 // get request when creating a new user
 router.get("/:username", async (req, res) => {
   const { username } = req.params;
+  console.log(req.params);
 
   try {
     //   checking if the username has a length greater than one

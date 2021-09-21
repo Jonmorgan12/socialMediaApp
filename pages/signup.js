@@ -10,7 +10,8 @@ import {
   TextArea,
   Divider,
 } from "semantic-ui-react";
-import { set } from "mongoose";
+import axios from "axios";
+import baseUrl from "../utils/baseUrl";
 
 const regexUserName = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
 
@@ -68,6 +69,30 @@ function Signup() {
       setSubmitDisabled(true);
     }
   }, [user]);
+
+  const checkUsername = async () => {
+    setUsernameLoading(true);
+    try {
+      // response to the backend
+      const res = await axios.get(`${baseUrl}/api/signup/${username}`);
+
+      if (res.data === "Available") {
+        setUsernameAvailable(true);
+        setUser((prev) => ({ ...prev, username }));
+      }
+    } catch (error) {
+      setErrorMsg("Username Not Available");
+    }
+    setUsernameLoading(false);
+  };
+
+  useEffect(() => {
+    if (username === "") {
+      setUsernameAvailable(false);
+    } else {
+      checkUsername();
+    }
+  }, [username]);
 
   return (
     <>
